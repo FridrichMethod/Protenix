@@ -279,9 +279,7 @@ def run_mmseqs2_service(
                         prefix, "bfd.mgnify30.metaeuk30.smag30.a3m"
                     )
                     with open(env_a3m_fpath, "r") as f:
-                        env_a3m_dict = parse_fasta_string(
-                            f.read().replace("\x00", "")
-                        )
+                        env_a3m_dict = parse_fasta_string(f.read().replace("\x00", ""))
                     uniref_a3m_fpath = os.path.join(prefix, "uniref.a3m")
                     with open(uniref_a3m_fpath, "r") as f:
                         uniref_a3m_dict = parse_fasta_string(

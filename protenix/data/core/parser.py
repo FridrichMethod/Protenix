@@ -36,6 +36,7 @@ from packaging import version
 from protenix.data.constants import (
     CRYSTALLIZATION_METHODS,
     DNA_STD_RESIDUES,
+    EntityPolyTypeDict,
     GLYCANS,
     IONS,
     LIGAND_EXCLUSION,
@@ -44,7 +45,6 @@ from protenix.data.constants import (
     RES_ATOMS_DICT,
     RNA_STD_RESIDUES,
     STD_RESIDUES,
-    EntityPolyTypeDict,
 )
 from protenix.data.core import ccd
 from protenix.data.core.ccd import get_ccd_ref_info
