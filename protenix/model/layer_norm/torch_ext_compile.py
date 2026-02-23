@@ -22,7 +22,7 @@ from torch.utils.cpp_extension import load
 def compile(
     name: str, sources: list[str], extra_include_paths: list[str], build_directory: str
 ) -> Any:
-    os.environ["TORCH_CUDA_ARCH_LIST"] = "7.0;8.0"
+    os.environ["TORCH_CUDA_ARCH_LIST"] = "8.0;8.6;9.0;12.0"
     return load(
         name=name,
         sources=sources,
@@ -46,13 +46,13 @@ def compile(
             "--expt-relaxed-constexpr",
             "--expt-extended-lambda",
             "-gencode",
-            "arch=compute_70,code=sm_70",
-            "-gencode",
             "arch=compute_80,code=sm_80",
             "-gencode",
             "arch=compute_86,code=sm_86",
             "-gencode",
             "arch=compute_90,code=sm_90",
+            "-gencode",
+            "arch=compute_120,code=sm_120",
         ],
         verbose=True,
         build_directory=build_directory,
