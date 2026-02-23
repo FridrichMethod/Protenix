@@ -142,5 +142,6 @@ checkpoint/
 search_database/
 test/
 results/
+mmcif/
 
 *.tar.gz
