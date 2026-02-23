@@ -40,10 +40,18 @@ def _get_cuda_archs() -> tuple[str, list[str]]:
     except Exception:
         pass
 
+    if cuda_ver is None:
+        return "7.0;8.0", [
+            "-gencode",
+            "arch=compute_70,code=sm_70",
+            "-gencode",
+            "arch=compute_80,code=sm_80",
+        ]
+
     arch_list: list[str] = []
     gencode_flags: list[str] = []
     for arch_str, arch_num, min_ver in _DESIRED_ARCHS:
-        if cuda_ver is None or cuda_ver >= min_ver:
+        if cuda_ver >= min_ver:
             arch_list.append(arch_str)
             gencode_flags.extend(
                 ["-gencode", f"arch=compute_{arch_num},code=sm_{arch_num}"]
