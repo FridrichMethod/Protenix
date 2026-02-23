@@ -17,6 +17,8 @@
 # --- Script Configuration & Safety Settings ---
 set -euo pipefail
 
+command -v aria2c >/dev/null 2>&1 || { echo -e "\033[1;31m[ERROR]\033[0m aria2c is not installed. Install it with: apt install aria2"; exit 1; }
+
 # Log functions for formatted output
 info() { echo -e "\033[1;34m[INFO]\033[0m $1"; }
 err() { echo -e "\033[1;31m[ERROR]\033[0m $1"; exit 1; }
@@ -89,7 +91,7 @@ BASE_URL="https://protenix.tos-cn-beijing.volces.com"
 
 for file in "${DATA_FILES[@]}"; do
     info "Downloading $file from $BASE_URL/$file ..."
-    wget -c -P "$PROTENIX_ROOT_DIR" "$BASE_URL/$file"
+    aria2c -x 16 -s 16 -k 1M -c -d "$PROTENIX_ROOT_DIR" -o "$file" "$BASE_URL/$file"
 
     info "Extracting $file to $PROTENIX_ROOT_DIR ..."
     if [[ "$file" == *.tar.gz ]]; then

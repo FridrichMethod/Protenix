@@ -142,3 +142,5 @@ checkpoint/
 search_database/
 test/
 results/
+
+*.tar.gz
