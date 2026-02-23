@@ -58,8 +58,15 @@ def _get_cuda_archs() -> tuple[str, list[str]]:
             )
 
     if not arch_list:
-        arch_list.append("8.0")
-        gencode_flags.extend(["-gencode", "arch=compute_80,code=sm_80"])
+        arch_list.extend(["7.0", "8.0"])
+        gencode_flags.extend(
+            [
+                "-gencode",
+                "arch=compute_70,code=sm_70",
+                "-gencode",
+                "arch=compute_80,code=sm_80",
+            ]
+        )
 
     return ";".join(arch_list), gencode_flags
 
