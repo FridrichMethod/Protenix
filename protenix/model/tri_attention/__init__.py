@@ -32,11 +32,11 @@ except (ImportError, RuntimeError) as e:
     # Triton not available or not supported on this GPU
     TRITON_AVAILABLE = False
     triton_error = str(e)
-    
+
     # Provide fallback implementation using PyTorch
     class TriAttentionFunction:
         """Fallback implementation using PyTorch's native attention."""
-        
+
         @staticmethod
         def apply(
             q: torch.Tensor,
@@ -49,12 +49,12 @@ except (ImportError, RuntimeError) as e:
             """Apply attention using PyTorch's scaled_dot_product_attention."""
             # q, k, v shape: [B, N, S, H, D]
             B, N, S, H, D = q.shape
-            
+
             # Reshape for attention: [B*N*H, S, D]
             q = q.permute(0, 1, 3, 2, 4).reshape(B * N * H, S, D)
             k = k.permute(0, 1, 3, 2, 4).reshape(B * N * H, S, D)
             v = v.permute(0, 1, 3, 2, 4).reshape(B * N * H, S, D)
-            
+
             # Apply biases if provided
             attn_mask = None
             if bias1 is not None or bias2 is not None:
@@ -67,7 +67,7 @@ except (ImportError, RuntimeError) as e:
                 if bias2 is not None:
                     bias2_reshaped = bias2.reshape(B * N * H, S, 1)
                     attn_mask = attn_mask + bias2_reshaped
-            
+
             # Use PyTorch's optimized attention
             with torch.backends.cuda.sdp_kernel(
                 enable_flash=True,
@@ -80,14 +80,14 @@ except (ImportError, RuntimeError) as e:
                     dropout_p=0.0 if deterministic else 0.0,
                     is_causal=False
                 )
-            
+
             # Reshape back to original format
             out = out.reshape(B, N, H, S, D).permute(0, 1, 3, 2, 4)
             return out
-    
+
     class TriAttention(torch.nn.Module):
         """Fallback TriAttention module using PyTorch."""
-        
+
         def __init__(self) -> None:
             super().__init__()
             warnings.warn(
@@ -96,7 +96,7 @@ except (ImportError, RuntimeError) as e:
                 UserWarning,
                 stacklevel=2
             )
-        
+
         def forward(
             self,
             q: torch.Tensor,

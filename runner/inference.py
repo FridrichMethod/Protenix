@@ -613,7 +613,7 @@ def run() -> None:
     _, model_size, model_feature, model_version = model_name.split("_")
     logger.info(
         f"Inference by Protenix: model_size: {model_size}, "
-        f"with_feature: {model_feature.replace('-',', ')}, "
+        f"with_feature: {model_feature.replace('-', ', ')}, "
         f"model_version: {model_version}, dtype: {configs.dtype}"
     )
     configs = update_gpu_compatible_configs(configs)
