@@ -136,3 +136,6 @@ cython_debug/
 wandb/
 output/
 release_data/
+
+common/
+checkpoint/
