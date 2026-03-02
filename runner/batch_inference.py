@@ -299,6 +299,7 @@ def get_default_runner(
     use_template: bool = False,
     use_rna_msa: bool = False,
     use_seeds_in_json: bool = False,
+    need_atom_confidence: bool = False,
     kalign_binary_path: Optional[str] = None,
 ) -> InferenceRunner:
     """
@@ -334,7 +335,17 @@ def get_default_runner(
     if seeds is not None:
         configs.seeds = seeds
     model_name = configs.model_name
-    _, model_size, model_feature, model_version = model_name.split("_")
+    model_name_parts = model_name.split("_", 3)
+    if len(model_name_parts) == 4:
+        _, model_size, model_feature, model_version = model_name_parts
+    else:
+        model_size = "unknown"
+        model_feature = "unknown"
+        model_version = "unknown"
+        logger.warning(
+            "Unexpected model_name format '%s'; expected protenix_<size>_<feature>_<version>.",
+            model_name,
+        )
     model_specfics_configs = ConfigDict(model_configs[model_name])
     # update model specific configs
     configs.update(model_specfics_configs)
@@ -352,6 +363,7 @@ def get_default_runner(
     configs.use_template = use_template
     configs.use_rna_msa = use_rna_msa
     configs.use_seeds_in_json = use_seeds_in_json
+    configs.need_atom_confidence = need_atom_confidence
     if kalign_binary_path is not None:
         # The path provided by the user is expected to exist by default
         configs.data.template.kalign_binary_path = kalign_binary_path
@@ -425,6 +437,7 @@ def inference_jsons(
     use_template: bool = False,
     use_rna_msa: bool = False,
     use_seeds_in_json: bool = False,
+    need_atom_confidence: bool = False,
     kalign_binary_path: Optional[str] = None,
     hmmsearch_binary_path: Optional[str] = None,
     hmmbuild_binary_path: Optional[str] = None,
@@ -505,6 +518,7 @@ def inference_jsons(
         use_template=use_template,
         use_rna_msa=use_rna_msa,
         use_seeds_in_json=use_seeds_in_json,
+        need_atom_confidence=need_atom_confidence,
         kalign_binary_path=kalign_binary_path,
     )
     configs = runner.configs
@@ -656,6 +670,12 @@ def protenix_cli() -> None:
     help="Priority to seeds defined in input JSON.",
 )
 @click.option(
+    "--need_atom_confidence",
+    type=bool,
+    default=False,
+    help="Whether to compute atom-level confidence scores.",
+)
+@click.option(
     "--kalign_binary_path",
     type=str,
     default=None,
@@ -741,6 +761,7 @@ def predict(
     use_template: bool,
     use_rna_msa: bool,
     use_seeds_in_json: bool,
+    need_atom_confidence: bool,
     kalign_binary_path: Optional[str] = None,
     hmmsearch_binary_path: Optional[str] = None,
     hmmbuild_binary_path: Optional[str] = None,
@@ -776,6 +797,7 @@ def predict(
         use_template (bool): Use templates.
         use_rna_msa (bool): Use RNA MSA.
         use_seeds_in_json (bool): Use seeds from JSON.
+        need_atom_confidence (bool): Compute atom-level confidence scores.
         kalign_binary_path (Optional[str]): Path to kalign binary.
         hmmsearch_binary_path (Optional[str]): Path to hmmsearch binary.
         hmmbuild_binary_path (Optional[str]): Path to hmmbuild binary.
@@ -888,6 +910,7 @@ def predict(
         use_template=use_template,
         use_rna_msa=use_rna_msa,
         use_seeds_in_json=use_seeds_in_json,
+        need_atom_confidence=need_atom_confidence,
         kalign_binary_path=kalign_binary_path,
         hmmsearch_binary_path=hmmsearch_binary_path,
         hmmbuild_binary_path=hmmbuild_binary_path,
@@ -1044,7 +1067,7 @@ def msa(input: str, out_dir: str, msa_server_mode: str) -> Union[str, dict]:
             protein_seqs.append(str(seq.seq))
         protein_seqs = sorted(protein_seqs)
         msa_res_subdirs = msa_search(protein_seqs, out_dir, msa_server_mode)
-        assert len(msa_res_subdirs) == len(msa_res_subdirs), "msa search failed"
+        assert len(msa_res_subdirs) == len(protein_seqs), "msa search failed"
         fasta_msa_res = dict(zip(protein_seqs, msa_res_subdirs))
         logger.info(
             f"msa result is: {fasta_msa_res}, and it has been save to {out_dir}"
