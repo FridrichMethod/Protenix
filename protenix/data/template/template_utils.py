@@ -22,9 +22,9 @@ import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Mapping, Optional, Sequence, Tuple, Union
 
-import requests
-
 import numpy as np
+
+import requests
 from typing_extensions import Final, TypeAlias
 
 from protenix.data.constants import (
@@ -705,7 +705,9 @@ class TemplateHitProcessor:
                 track["load"] = time.time() - t_start
             except (FileNotFoundError, requests.RequestException) as e:
                 return (
-                    SingleHitResult(None, None, f"CIF load failed for {pdb_id}: {e}", None),
+                    SingleHitResult(
+                        None, None, f"CIF load failed for {pdb_id}: {e}", None
+                    ),
                     track,
                 )
 
