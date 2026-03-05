@@ -28,48 +28,48 @@ shopt -s nullglob
 # Exclude files ending with -final-updated.json and -update-msa.json
 jsons=()
 for f in "${input_dir}"/*.json; do
-    [[ ! -e "$f" ]] && continue
-    [[ "$f" == *-final-updated.json ]] && continue
-    [[ "$f" == *-update-msa.json ]] && continue
-    jsons+=("$f")
+  [[ ! -e "$f" ]] && continue
+  [[ "$f" == *-final-updated.json ]] && continue
+  [[ "$f" == *-update-msa.json ]] && continue
+  jsons+=("$f")
 done
 if [[ ${#jsons[@]} -eq 0 ]]; then
-    echo "No suitable *.json in ${input_dir}" >&2
-    exit 1
+  echo "No suitable *.json in ${input_dir}" >&2
+  exit 1
 fi
 
 # Skip if output already has predicted structure (resume after cancel).
 already_done() {
-    local o="$1"
-    [[ -d "$o" ]] && find "$o" -name "*.cif" -type f 2>/dev/null | grep -q .
+  local o="$1"
+  [[ -d "$o" ]] && find "$o" -name "*.cif" -type f 2>/dev/null | grep -q .
 }
 
 echo "Predict: ${#jsons[@]} JSON(s), up to ${parallel_jobs} in parallel (skip existing)."
 
 run_one() {
-    local j="$1" o="$2"
-    mkdir -p "$o"
-    protenix pred -i "$j" -o "$o" \
-        --seeds 101 --model_name protenix_base_20250630_v1.0.0 \
-        --use_msa true --use_template true --use_default_params false \
-        --sample 5 --step 200 --cycle 10
+  local j="$1" o="$2"
+  mkdir -p "$o"
+  protenix pred -i "$j" -o "$o" \
+    --seeds 101 --model_name protenix_base_20250630_v1.0.0 \
+    --use_msa true --use_template true --use_default_params false \
+    --sample 5 --step 200 --cycle 10
 }
 
 running=0
 for json in "${jsons[@]}"; do
-    base="${json##*/}"
-    out_sub="${out_dir}/${base%.json}"
-    if already_done "$out_sub"; then
-        echo "Skip (done): $base"
-        continue
-    fi
-    run_one "$json" "$out_sub" &
-    ((running++)) || true
-    if ((running >= parallel_jobs)); then
-        # Wait for any one job to finish, then immediately start a new one.
-        wait -n
-        ((running--)) || true
-    fi
+  base="${json##*/}"
+  out_sub="${out_dir}/${base%.json}"
+  if already_done "$out_sub"; then
+    echo "Skip (done): $base"
+    continue
+  fi
+  run_one "$json" "$out_dir" &
+  ((running++)) || true
+  if ((running >= parallel_jobs)); then
+    # Wait for any one job to finish, then immediately start a new one.
+    wait -n
+    ((running--)) || true
+  fi
 done
 # Wait for all remaining jobs to finish.
 wait
