@@ -2590,9 +2590,7 @@ class AddAtomArrayAnnot(object):
         for start, end in zip(chain_starts[:-1], chain_starts[1:]):
             mol_types = atom_array.mol_type[start:end]
             mol_type_count = Counter(mol_types)
-            sorted_by_key = sorted(mol_type_count.items(), key=lambda x: x[0])
-            sorted_by_value = sorted(sorted_by_key, key=lambda x: x[1])
-            most_freq_mol_type = sorted_by_value[0][0]
+            most_freq_mol_type = max(mol_type_count, key=mol_type_count.get)
             chain_mol_type.extend([most_freq_mol_type] * (end - start))
 
         atom_array.set_annotation(
