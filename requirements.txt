@@ -1,4 +1,4 @@
-torch==2.7.1
+torch==2.8.0
 torchvision==0.22.1
 torchaudio==2.7.1
 cuequivariance-ops-torch-cu12==0.8.0
@@ -12,7 +12,7 @@ matplotlib==3.10.5
 ipywidgets==8.1.7
 py3Dmol==2.5.2
 rdkit==2025.9.3
-biopython==1.85
+biopython==1.87
 biotite==1.4.0
 modelcif==1.4
 gemmi==0.6.7
@@ -24,7 +24,7 @@ deepspeed==0.17.5
 pydantic>=2.0.0
 triton==3.3.1
 optree==0.17.0
-protobuf==6.31.1
+protobuf==6.33.5
 icecream==2.1.7
 ipdb==0.13.13
 wandb==0.21.1
