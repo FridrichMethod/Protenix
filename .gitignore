@@ -146,3 +146,4 @@ mmcif/
 
 *.tar.gz
 debug/
+.trae/
